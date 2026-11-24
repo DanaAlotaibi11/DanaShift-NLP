@@ -1,73 +1,106 @@
-# DanaShift | Applied NLP
-**Multilingual customer support agent for technical consulting**
+# DanaShift
+
+### From customer messages to intelligent problem resolution.
+
+**Multilingual AI support agent for technical consulting**
 
 Developed as part of the **Applied Natural Language Processing Program** offered by **SDAIA Academy**, affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
 
-[**Try the Live Demo**](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) · [Project Notebook](DanaShift.ipynb)
+[**Explore the interactive demo**](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) · [Project notebook](DanaShift.ipynb) · [Product architecture](docs/architecture.md)
 
-## Overview
-DanaShift combines privacy-aware text preprocessing, Arabic language modeling, intent classification, entity annotation, semantic retrieval and human-supervised customer support workflows.
+## The challenge
 
-## Vision — From customer requests to problem resolution
+Technical support teams receive requests in different languages, dialects and levels of urgency. Manual triage consumes staff time, investigations may be repeated, and critical requests can get buried among routine messages.
 
-DanaShift is envisioned as an intelligent, multilingual support agent that goes beyond keyword matching and ticket routing. Its long-term goal is to understand customer problems in context, reason over relevant technical knowledge, identify possible causes, recommend practical solutions, and support resolution from the initial request through follow-up.
+**Sorting a request is not the same as solving it.**
 
-### Future capabilities
+## From inbox to resolution
 
-| Capability | Intended business value |
+DanaShift is envisioned as an AI-powered support agent that understands customer problems in context, retrieves relevant technical knowledge, identifies potential causes and recommends practical solutions. Its purpose is to help staff and customers move from the initial message toward resolution, not simply forward tickets.
+
+The target scope includes cybersecurity, cloud and infrastructure support, automation projects, meetings and proposals, with appropriate handling of out-of-scope requests.
+
+| Intended capability | Intended value |
 |---|---|
-| Contextual understanding of Arabic dialects and English | Understand customer intent even when requests are ambiguous or informally expressed |
-| Intelligent diagnosis and troubleshooting | Identify likely causes, ask targeted follow-up questions, and recommend evidence-grounded solutions |
-| Retrieval-augmented generation (RAG) | Retrieve relevant documentation, previous cases and approved procedures to support accurate answers |
-| Tool-enabled problem resolution | Integrate authorized ticketing, CRM, scheduling and project systems to support appropriate actions |
-| Multi-turn assistance | Maintain relevant case context and guide customers through troubleshooting and follow-up |
-| Human oversight and safe escalation | Escalate critical, uncertain or sensitive cases; require approval for consequential actions |
-| Privacy-aware processing | Minimize exposure of personal information throughout the support workflow |
+| Arabic dialects and English understanding | Reduce language barriers and interpret informal requests |
+| Contextual analysis and troubleshooting | Identify likely causes and ask useful follow-up questions |
+| Knowledge-grounded recommendations (RAG) | Reuse approved technical guidance and prior cases |
+| Privacy-aware processing | Reduce unnecessary exposure of personal information |
+| Authorized tool integration | Coordinate support tasks and case follow-up |
+| Human oversight | Escalate critical or uncertain cases and approve consequential actions |
 
-### Development roadmap
+These are development goals; business impact has not yet been measured.
 
-- **Current prototype:** NLP component experiments in the project notebook and a rule-based browser demonstration of the intended workflow.
-- **Next stage:** Integrate trained intent and entity models with semantic retrieval and a grounded reasoning layer; evaluate on larger multilingual datasets.
-- **Future product:** Build an agent capable of contextual troubleshooting, recommending and coordinating solutions through authorized tools, with human approval where appropriate.
-- **Impact validation:** Measure resolution quality, response time, routing accuracy and staff workload against a manual baseline.
+## AI resolution pipeline — target architecture
 
-The rule-based demo is a lightweight illustration of the user experience, not the intended final architecture. The future capabilities and business benefits above are development objectives, not claims of currently deployed functionality or measured outcomes.
-
-## Experimental methodology
-| Stage | Focus | Recorded result |
-|---|---|---|
-| 1 | Normalization, PII masking, multilingual tokenization | Arabic fertility 3.32; English 1.95; p95 length 36.5; UNK rate 0.0058 |
-| 2 | Attention, masking and CAMeLBERT attention maps | PAD attention with mask 0.0; without mask 0.294 |
-| 3 | CAMeLBERT classification, grouped split | Saved split: 6 train rows, 2 test rows, no shared client IDs; counts require revalidation; eval loss 3.3970 |
-| 4 | BIO alignment and Arabic morphology | 8/8 alignment tests; 9/9 illustrative labels |
-| 5 | MiniLM embeddings, FAISS and CrossEncoder | Example rank 2 before reranking, rank 1 after reranking |
-| 6 | Sliced evaluation and error analysis | Illustrative bootstrap interval 0.375–1.0 |
-
-These are saved notebook outputs and small exercises, not production benchmarks. The classification experiment trained four labels; automation and out-of-scope are proposed extensions. The entity annotation experiment's illustrative labels and manually specified F1 values are not measured model performance. The evaluation example uses supplied labels and predictions.
-
-## Proposed workflow
 ```mermaid
 flowchart TD
- A[Customer request] --> B[PII masking]
- B --> C[Intent and priority]
- C --> D[Entity extraction]
- D --> E{In scope?}
- E -->|No| H[Draft response]
- E -->|Yes| F[Knowledge retrieval]
- F --> G[Tool orchestration]
- G --> H
- H --> I[Human review]
+    A["Customer message · Arabic / English"] --> B["Privacy masking"]
+    B --> C["Contextual understanding · intent & urgency"]
+    C --> D["Entity extraction & case context"]
+    D --> E{"Within service scope?"}
+    E -->|No| F["Explain scope · offer human assistance"]
+    E -->|Yes| G{"Critical or sensitive?"}
+    G -->|Yes| H["Recommend immediate specialist escalation"]
+    G -->|No| I["Retrieve approved knowledge & previous cases"]
+    H --> I
+    I --> J["Reason over evidence · identify likely causes"]
+    J --> K{"Enough context and evidence?"}
+    K -->|No| L["Ask targeted follow-up questions"]
+    L --> B
+    K -->|Yes| M["Recommend a resolution plan"]
+    M --> N["Human review & authorization"]
+    N -->|Approved| O["Authorized tools · ticket / CRM / scheduling"]
+    N -->|Revise| J
+    O --> P["Verify outcome & follow up"]
+    P --> Q{"Issue resolved?"}
+    Q -->|Yes| R["Close case · record outcome"]
+    Q -->|No| I
+    classDef core fill:#e4ecd9,stroke:#49644d,color:#182b22
+    classDef review fill:#ffe7ce,stroke:#d67a36,color:#55331e
+    class B,C,D,I,J,M core
+    class H,N,P review
 ```
 
-## Project notebook
+This is the proposed future workflow, not a claim of an integrated production system. The current browser prototype demonstrates initial triage and suggested actions using rules; it does not run trained models, perform live diagnosis, execute tools or send messages.
 
-[**Open DanaShift.ipynb**](DanaShift.ipynb) — unified project explanation, code, saved experimental results and original Colab figures.
+## Example: a customer reports a technical issue
 
-## Repository guide
-- [Experiment notes](docs/experiments.md)
-- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — current rule-based workflow preview; the long-term vision is a model-powered problem-resolution agent.
+> Our system keeps crashing after the latest update. Can you help identify the cause and restore service?
+
+The envisioned agent would clarify symptoms, retrieve relevant documentation, reason about potential causes, propose troubleshooting steps, request approval for consequential actions and follow up to verify the outcome. If evidence is insufficient or specialist input is needed, the case is escalated rather than presenting a speculative diagnosis as fact.
+
+## Experimental foundations
+
+| Component | Recorded observation |
+|---|---|
+| Multilingual tokenization | Arabic fertility 3.32 vs English 1.95 on six examples; unknown token rate 0.58%; p95 length 36.5 |
+| Attention masking | Padding attention 0 with mask vs 0.294 without mask |
+| CAMeLBERT fine-tuning | Four intent labels; 16 source examples; saved evaluation loss 3.3970; split counts require revalidation |
+| BIO alignment | 8/8 alignment checks passed; not a measure of trained NER accuracy |
+| Semantic retrieval | MiniLM, FAISS and CrossEncoder; relevant candidate moved from rank 2 to 1 in a supplied candidate example |
+| Evaluation | Illustrative bootstrap interval 37.5%–100% on supplied predictions, not a trained model benchmark |
+
+These observations come from saved notebook experiments and small illustrative samples, not production performance benchmarks. The separate FAISS example already retrieved the relevant incident first; the reranking comparison uses a separately supplied candidate order.
+
+## Development roadmap
+
+| Stage | Focus |
+|---|---|
+| Current | NLP experiments and browser-based workflow prototype |
+| Next | Validate multilingual datasets, rerun grouped training, export model checkpoints and integrate semantic retrieval |
+| Future | Contextual reasoning, multi-turn troubleshooting, grounded recommendations and authorized tool execution |
+| Validation | Measure resolution quality, response time, routing accuracy and staff workload against a manual baseline |
+
+## Explore the project
+
+- [DanaShift.ipynb](DanaShift.ipynb) — methodology, code, charts and experimental results.
+- [Architecture and workflow](docs/architecture.md) — target design and operational safeguards.
+- [Experiment notes](docs/experiments.md) — supporting technical observations.
+- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — initial workflow preview.
 
 ## Acknowledgments
-SDAIA Academy, Saudi Data and Artificial Intelligence Authority, for the Applied Natural Language Processing Program.
 
-This educational project is not an official SDAIA product. No customer messages are sent automatically.
+SDAIA Academy — Applied Natural Language Processing Program, Saudi Data and Artificial Intelligence Authority (SDAIA).
+
+DanaShift is an educational project, not an official SDAIA product.
