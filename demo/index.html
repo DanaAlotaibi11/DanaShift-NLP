@@ -483,7 +483,7 @@ select,textarea{background:#fcfdf9;border-color:#cdd5c8}select:focus,textarea:fo
 
       
 
-      <div class="grid" style="margin-top:20px;"><div class="card" style="padding:18px"><h2>Privacy-safe request</h2><div id="maskedOutput" class="draft-box"></div><h2 style="margin-top:16px">Detected entities</h2><div id="entitiesOutput"></div></div><div class="card" style="padding:18px"><h2>Suggested next steps</h2><p class="small">Proposed only — not executed.</p><ol id="actionsOutput"></ol><p id="reason" class="small"></p></div>
+      <div class="grid" style="margin-top:20px;"><div class="card" style="padding:18px"><h2>Privacy-safe request</h2><div id="maskedOutput" class="draft-box"></div><div id="entitySection" hidden><h2 style="margin-top:16px">Detected entities</h2><div id="entitiesOutput"></div></div></div><div class="card" style="padding:18px"><h2>Suggested next steps</h2><p class="small">Proposed only — not executed.</p><ol id="actionsOutput"></ol><p id="reason" class="small"></p></div>
         <div class="card" style="padding:18px;">
           <details><summary style="cursor:pointer;font-weight:700">Developer view · JSON</summary><pre class="json-box" id="jsonOutput"></pre></details>
         </div>
@@ -522,7 +522,7 @@ function show(o){
  
  $("draftOutput").textContent=o.draft_reply;$("draftOutput").dir="auto";$("jsonOutput").textContent=JSON.stringify(o,null,2);
  $("maskedOutput").textContent=o.masked_request;$("maskedOutput").dir="auto";
- $("entitiesOutput").replaceChildren();for(const [k,v] of Object.entries(o.entities)){let p=document.createElement("p");p.textContent=k+": "+(v.join(", ")||"None detected");$("entitiesOutput").append(p);}
+ $("entitiesOutput").replaceChildren();const found=Object.entries(o.entities).filter(([k,v])=>v.length>0);$("entitySection").hidden=found.length===0;const entityLabels={PER:"Person",ORG:"Organization",LOC:"Location",DATE:"Date"};for(const [k,v] of found){let p=document.createElement("p");p.textContent=entityLabels[k]+": "+v.join(", ");$("entitiesOutput").append(p);}
  $("actionsOutput").replaceChildren();for(const a of o.planned_actions){let li=document.createElement("li");li.textContent=a;$("actionsOutput").append(li);}if(!o.planned_actions.length){let li=document.createElement("li");li.textContent="No automated actions proposed";$("actionsOutput").append(li);}
  $("reason").textContent=o.review_reason;
  results.hidden=false;requestAnimationFrame(()=>{results.classList.add("show");results.scrollIntoView({behavior:"smooth",block:"start"});});
