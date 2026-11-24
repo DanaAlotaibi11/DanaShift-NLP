@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DanaShift | Live Demo</title>
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --card:#ffffff;
+      --text:#17324a;
+      --muted:#5d7287;
+      --primary:#0f3a5a;
+      --primary-2:#135f73;
+      --accent:#12a3a6;
+      --line:#d7e0ea;
+      --success:#1f9d55;
+      --danger:#d64545;
+      --warning:#d98a00;
+      --shadow:0 18px 40px rgba(14, 41, 66, 0.10);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg,#f4f8fb 0%, #edf3f8 100%);
+      color:var(--text);
+    }
+
+    .wrap{
+      width:min(1180px, 92%);
+      margin:28px auto 60px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      padding:32px 28px;
+      border-radius:28px;
+      background:linear-gradient(135deg, #0d2d47 0%, #103f63 55%, #14687c 100%);
+      color:white;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+
+    .hero::before,
+    .hero::after{
+      content:"";
+      position:absolute;
+      border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      filter:blur(2px);
+      animation: float 7s ease-in-out infinite;
+    }
+    .hero::before{
+      width:180px;height:180px;right:-30px;top:-30px;
+    }
+    .hero::after{
+      width:120px;height:120px;left:55%;bottom:-40px;animation-delay:1.2s;
+    }
+
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+      font-size:clamp(30px, 4vw, 52px);
+      line-height:1.05;
+      letter-spacing:-0.02em;
+    }
+
+    .hero p{
+      margin:8px 0;
+      color:rgba(255,255,255,0.9);
+      max-width:700px;
+      font-size:18px;
+    }
+
+    .hero .tagline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.15);
+      font-size:14px;
+      margin-top:10px;
+      backdrop-filter:blur(8px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid rgba(18,53,82,0.07);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .card h2{
+      margin:0 0 8px;
+      font-size:20px;
+    }
+
+    .sub{
+      color:var(--muted);
+      margin:0 0 18px;
+      line-height:1.6;
+      font-size:14.5px;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin:14px 0 8px;
+      color:var(--text);
+    }
+
+    select, textarea{
+      width:100%;
+      border:1px solid #cfd9e3;
+      border-radius:16px;
+      padding:14px 15px;
+      font:inherit;
+      color:var(--text);
+      background:#fbfdff;
+      transition:.22s ease;
+      outline:none;
+    }
+
+    select:focus, textarea:focus{
+      border-color:#5ea3cc;
+      box-shadow:0 0 0 4px rgba(46, 121, 178, 0.12);
+      background:white;
+    }
+
+    textarea{
+      min-height:150px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:16px;
+    }
+
+    button{
+      border:none;
+      border-radius:16px;
+      padding:13px 18px;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .16s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, #0f7f87 0%, #14687c 100%);
+      color:white;
+      box-shadow:0 10px 24px rgba(15,127,135,0.22);
+    }
+
+    .btn-primary:hover{ transform:translateY(-1px); }
+    .btn-secondary{
+      background:#eff5fa;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .status-bar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .mini{
+      flex:1 1 130px;
+      background:linear-gradient(180deg,#fbfdff,#f3f7fb);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-width:120px;
+    }
+
+    .mini .k{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .mini .v{
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      border:1px solid transparent;
+    }
+
+    .critical{background:#fff0f0;color:#b53c3c;border-color:#f3c6c6}
+    .normal{background:#fff8e9;color:#9b6500;border-color:#f0d8a1}
+    .low{background:#eefaf3;color:#1b7c4b;border-color:#bde4cc}
+    .security{background:#eff6ff;color:#215caa;border-color:#c9dcff}
+    .cloud{background:#eefcff;color:#0d7188;border-color:#bfeaf3}
+    .meetings{background:#f6f1ff;color:#6d43bf;border-color:#d8caf8}
+    .proposals{background:#fff3ea;color:#b7611d;border-color:#f1cfb0}
+    .automation{background:#edfbf7;color:#0d8b67;border-color:#b8eadb}
+    .out_of_scope{background:#f3f5f7;color:#5f6d7b;border-color:#d7dee6}
+
+    .result-panel{
+      opacity:0;
+      transform:translateY(14px);
+      transition: .35s ease;
+    }
+    .result-panel.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .loading{
+      display:none;
+      align-items:center;
+      gap:10px;
+      margin-top:14px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .loading.show{display:flex}
+
+    .spinner{
+      width:18px;height:18px;border-radius:999px;
+      border:3px solid #d7e7eb;
+      border-top-color:var(--accent);
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .json-box{
+      background:#f5f8fc;
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:14px;
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+      max-height:420px;
+    }
+
+    .draft-box{
+      background:linear-gradient(180deg,#fcfeff,#f6fbff);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      line-height:1.8;
+      white-space:pre-wrap;
+    }
+
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .timeline{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .step{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:16px;
+      padding:12px 14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .step-index{
+      width:28px;height:28px;border-radius:999px;
+      background:#dff3f1;
+      color:#0d756a;
+      display:grid;place-items:center;
+      font-size:13px;font-weight:800;
+      flex-shrink:0;
+    }
+
+    .progress{
+      height:10px;
+      background:#e8eef4;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+
+    .progress > span{
+      display:block;
+      height:100%;
+      width:0;
+      border-radius:999px;
+      background:linear-gradient(90deg,#1a8b9a,#2b71d7);
+      transition:width .6s ease;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .hidden{display:none}
+  [hidden]{display:none!important}.step.active{border-color:#168780;background:#eaf9f7;transform:translateX(4px);box-shadow:0 0 0 3px #16878022}.step.done .step-index{background:#168780;color:#fff}.step{transition:all .25s ease}button:disabled{opacity:.6;cursor:wait}#actionsOutput li{padding:8px 0;border-bottom:1px solid var(--line)}#entitiesOutput p{margin:8px 0}.result-panel{scroll-margin-top:18px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>DanaShift / NLP</h1>
+      <p>Multilingual customer-support workflow sandbox for technical consulting requests.</p>
+      <p>Applied NLP Program · SDAIA Academy</p>
+      <div class="tagline">Interactive prototype · Rule-based analysis · Human review required</div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Request Analysis</h2>
+        <p class="sub">Choose a sample or enter your own synthetic request. Do not use real personal data.</p>
+
+        <label for="sample">Quick sample</label>
+        <select id="sample">
+          <option value="فيه أحد حاول يدخل على إيميلاتنا">فيه أحد حاول يدخل على إيميلاتنا</option>
+          <option value="النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة">النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة</option>
+          <option value="أحتاج موعد مع المهندس سلطان بكرة العصر">أحتاج موعد مع المهندس سلطان بكرة العصر</option>
+          <option value="Please send the final proposal and budget details">Please send the final proposal and budget details</option>
+          <option value="وش صار على مشروع الأتمتة؟">وش صار على مشروع الأتمتة؟</option>
+          <option value="وش أفضل مطعم في الرياض؟">وش أفضل مطعم في الرياض؟</option>
+        </select>
+
+        <label for="request">Customer request</label>
+        <textarea id="request">فيه أحد حاول يدخل على إيميلاتنا</textarea>
+
+        <div class="row">
+          <button class="btn-primary" id="analyzeBtn">Analyze request</button>
+          <button class="btn-secondary" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <span><span id="stageText">Preparing request…</span></span>
+        </div>
+
+        <p id="message" role="status" class="small"></p><div class="status-bar" id="quickStats">
+          <div class="mini">
+            <div class="k">Mode</div>
+            <div class="v">Sandbox</div>
+          </div>
+          <div class="mini">
+            <div class="k">Output</div>
+            <div class="v">JSON + Draft</div>
+          </div>
+          <div class="mini">
+            <div class="k">Review</div>
+            <div class="v">Required</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div>
+            <h2 style="margin:0">Processing Flow</h2>
+            <p class="sub" style="margin-top:8px">A visual walkthrough of what the agent does.</p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="step">
+            <div class="step-index">1</div>
+            <div>
+              <strong>Privacy masking</strong>
+              <div class="small">Emails, phone numbers, IDs and IBANs are masked before downstream handling.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">2</div>
+            <div>
+              <strong>Intent & priority detection</strong>
+              <div class="small">The request is mapped to cloud, security, automation, meetings, proposals or out_of_scope.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">3</div>
+            <div>
+              <strong>Entity extraction</strong>
+              <div class="small">Example names, organizations, locations and dates are matched using a small dictionary.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">4</div>
+            <div>
+              <strong>Actions & draft reply</strong>
+              <div class="small">Suggested actions and a template reply are prepared. No tools are called.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card result-panel" id="results" style="margin-top:20px;">
+      <div class="section-title">
+        <div>
+          <h2 style="margin:0">Review Workspace</h2>
+          <p class="sub" style="margin-top:8px">All outputs require staff review. No customer messages are sent.</p>
+        </div>
+        <button class="btn-secondary" id="copyBtn">Copy JSON</button>
+      </div>
+
+      <div class="status-bar" id="badgesRow">
+        <span class="badge security" id="catBadge">Category: security</span>
+        <span class="badge critical" id="priBadge">Priority: critical</span>
+        <span class="badge" id="reviewBadge" style="background:#eef4fb;border-color:#cfdeef;color:#35506a;">Staff review required</span>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div style="font-weight:700; margin-bottom:8px;">Confidence</div>
+        <div class="progress"><span id="confidenceBar"></span></div>
+        <div class="small" id="confidenceText" style="margin-top:8px;">Not available — rule-based preview</div>
+      </div>
+
+      <div class="grid" style="margin-top:20px;"><div class="card" style="padding:18px"><h2>Privacy-safe request</h2><div id="maskedOutput" class="draft-box"></div><h2 style="margin-top:16px">Detected entities</h2><div id="entitiesOutput"></div></div><div class="card" style="padding:18px"><h2>Suggested next steps</h2><p class="small">Proposed only — not executed.</p><ol id="actionsOutput"></ol><p id="reason" class="small"></p></div>
+        <div class="card" style="padding:18px;">
+          <details><summary style="cursor:pointer;font-weight:700">Developer view · JSON</summary><pre class="json-box" id="jsonOutput"></pre></details>
+        </div>
+
+        <div class="card" style="padding:18px;">
+          <h2 style="font-size:18px;">Draft Reply</h2>
+          <div class="draft-box" id="draftOutput"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+const $=id=>document.getElementById(id);
+const requestBox=$("request"),results=$("results"),btn=$("analyzeBtn"),loading=$("loading");
+const rules=[["security",/اختراق|حاول يدخل|إيميلاتنا|ايميلاتنا|تسرب|تسرّب|أمن|امن|security|breach|hack|phishing|unauthorized/i],["meetings",/موعد|اجتماع|meeting|schedule|appointment/i],["proposals",/عرض|سعر|تكلف|proposal|budget|quote|pricing/i],["automation",/أتمتة|اتمتة|automation|workflow|project status/i],["cloud",/سحاب|استضاف|سيرفر|server|cloud|backup|migration/i]];
+const names={security:"Cybersecurity",meetings:"Meetings",proposals:"Proposals",automation:"Automation",cloud:"Cloud services",out_of_scope:"Out of scope"};
+const plan={security:["Notify security team if critical","Create incident ticket","Search approved knowledge","Update CRM"],meetings:["Check engineer availability","Propose a slot if available","Update CRM"],proposals:["Retrieve proposal","Create sales follow-up ticket","Update CRM"],automation:["Check project status","Update CRM"],cloud:["Retrieve relevant guidance","Create cloud support ticket","Update CRM"],out_of_scope:[]};
+function analyze(t){
+ let masked=t.replace(/\bSA\d{2}(?:[ ]?[A-Z0-9]){20}\b/gi,"[IBAN]").replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi,"[EMAIL]").replace(/(?:\+966|00966|0)[\s-]?5(?:[\s-]?\d){8}\b/g,"[PHONE]").replace(/\b[12]\d{9}\b/g,"[NATIONAL_ID]");
+ let hits=rules.filter(x=>x[1].test(masked)),category=hits[0]?.[0]||"out_of_scope",critical=/اختراق|حاول يدخل|تسرّب|تسرب|breach|hack|unauthorized|طاح بالكامل|server is down|outage/i.test(masked),priority=category==="out_of_scope"?"low":critical?"critical":"normal",ar=/[\u0600-\u06ff]/.test(masked);
+ const dictionaries={PER:["سلطان","أحمد","محمد","خالد","Sultan","Ahmed","Khalid"],ORG:["DanaShift","دانا شيفت"],LOC:["الرياض","جدة","Riyadh","Jeddah"],DATE:["بكرة","غدًا","اليوم","أمس","tomorrow","today","next week"]};
+ let entities=Object.fromEntries(Object.entries(dictionaries).map(([k,v])=>[k,v.filter(x=>masked.toLowerCase().includes(x.toLowerCase()))]));
+ let replies={meetings:["شكرًا لتواصلك. يمكن لفريقنا مراجعة توفر المهندس واقتراح موعد مناسب بعد التحقق.","Thank you for reaching out. Our team can check the engineer’s availability and propose a suitable meeting time."],security:["شكرًا لإبلاغنا. يحتاج طلبك إلى مراجعة فريق الأمن السيبراني لتحديد الخطوات المناسبة.","Thank you for reporting this. Our cybersecurity team should review the request and confirm appropriate next steps."],cloud:["شكرًا لتواصلك. يحتاج فريق الخدمات السحابية إلى مراجعة تفاصيل الطلب وتحديد الحل المناسب.","Thank you for contacting us. Our cloud team should review the details and confirm next steps."],automation:["شكرًا لتواصلك. يمكن للفريق مراجعة حالة مشروع الأتمتة وتزويدك بتحديث بعد التحقق.","Thank you for reaching out. The team can verify the automation project status and provide an update."],proposals:["شكرًا لتواصلك. يمكن لفريق المبيعات مراجعة تفاصيل العرض والرد بعد التحقق.","Thank you for reaching out. Our sales team can review the proposal details and respond after verification."],out_of_scope:["شكرًا لتواصلك. خدماتنا تركز على الاستشارات التقنية والسحابة والأمن السيبراني والأتمتة.","Thank you for reaching out. Our services focus on technical consulting, cloud, cybersecurity and automation."]};
+ return {category,priority,confidence:null,entities,masked_request:masked,actions_taken:[],planned_actions:hits.length===1?plan[category].filter(a=>critical||!a.includes("if critical")):[],draft_reply:replies[category][ar?0:1],sources:[],needs_review:true,review_reason:hits.length>1?"Multiple keyword categories matched. Human triage required.":"Rule-based preview; no trained model or connected tools.",language:ar?"Arabic":"English",matched_categories:hits.map(x=>x[0])};
+}
+const steps=[...document.querySelectorAll(".step")];
+let busy=false;
+$("sample").onchange=()=>{requestBox.value=$("sample").value;requestBox.dir="auto";};
+$("clearBtn").onclick=()=>{if(busy)return;requestBox.value="";results.hidden=true;results.classList.remove("show");steps.forEach(s=>s.classList.remove("active","done"));requestBox.focus();};
+$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText($("jsonOutput").textContent);$("copyBtn").textContent="Copied";}catch{$("copyBtn").textContent="Copy unavailable";}setTimeout(()=>$("copyBtn").textContent="Copy JSON",1500);};
+function show(o){
+ $("catBadge").textContent=names[o.category];$("catBadge").className="badge "+o.category;
+ $("priBadge").textContent="Priority: "+o.priority;$("priBadge").className="badge "+o.priority;
+ $("reviewBadge").textContent="Staff review required";
+ $("confidenceText").textContent="Not available — rule-based preview";$("confidenceBar").style.width="0";
+ $("draftOutput").textContent=o.draft_reply;$("draftOutput").dir="auto";$("jsonOutput").textContent=JSON.stringify(o,null,2);
+ $("maskedOutput").textContent=o.masked_request;$("maskedOutput").dir="auto";
+ $("entitiesOutput").replaceChildren();for(const [k,v] of Object.entries(o.entities)){let p=document.createElement("p");p.textContent=k+": "+(v.join(", ")||"None detected");$("entitiesOutput").append(p);}
+ $("actionsOutput").replaceChildren();for(const a of o.planned_actions){let li=document.createElement("li");li.textContent=a;$("actionsOutput").append(li);}if(!o.planned_actions.length){let li=document.createElement("li");li.textContent="No automated actions proposed";$("actionsOutput").append(li);}
+ $("reason").textContent=o.review_reason;
+ results.hidden=false;requestAnimationFrame(()=>{results.classList.add("show");results.scrollIntoView({behavior:"smooth",block:"start"});});
+}
+btn.onclick=async()=>{let t=requestBox.value.trim();if(!t){requestBox.focus();$("message").textContent="Enter a request to analyze.";return}busy=true;btn.disabled=true;$("clearBtn").disabled=true;btn.textContent="Analyzing…";$("message").textContent="";results.hidden=true;results.classList.remove("show");loading.classList.add("show");steps.forEach(s=>s.classList.remove("active","done"));for(let i=0;i<steps.length;i++){steps[i].classList.add("active");$("stageText").textContent=["Masking personal identifiers…","Matching service keywords…","Identifying example entities…","Preparing suggested actions and reply…"][i];await new Promise(r=>setTimeout(r,320));steps[i].classList.remove("active");steps[i].classList.add("done");}show(analyze(t));loading.classList.remove("show");btn.disabled=false;$("clearBtn").disabled=false;btn.textContent="Analyze request";busy=false;};
+results.hidden=true;requestBox.dir="auto";
+</script>
+</body>
+</html>
