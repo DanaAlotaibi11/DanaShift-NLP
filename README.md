@@ -3,7 +3,7 @@
 
 Developed as part of the **Applied Natural Language Processing Program** offered by **SDAIA Academy**, affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
 
-[**Try the Live Demo**](https://danaalotaibi11.github.io/DanaShift-NLP/demo/) · [Project Notebook](DanaShift.ipynb)
+[**Try the Live Demo**](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) · [Project Notebook](DanaShift.ipynb)
 
 ## Overview
 DanaShift combines privacy-aware text preprocessing, Arabic language modeling, intent classification, entity annotation, semantic retrieval and human-supervised customer support workflows.
@@ -40,7 +40,7 @@ flowchart TD
 
 ## Repository guide
 - [Experiment notes](docs/experiments.md)
-- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/) — browser-based simulated workflow, not live model inference.
+- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — browser-based simulated workflow, not live model inference.
 
 ## Acknowledgments
 SDAIA Academy, Saudi Data and Artificial Intelligence Authority, for the Applied Natural Language Processing Program.
