@@ -345,13 +345,38 @@
     }
 
     .hidden{display:none}
-  [hidden]{display:none!important}.step.active{border-color:#168780;background:#eaf9f7;transform:translateX(4px);box-shadow:0 0 0 3px #16878022}.step.done .step-index{background:#168780;color:#fff}.step{transition:all .25s ease}button:disabled{opacity:.6;cursor:wait}#actionsOutput li{padding:8px 0;border-bottom:1px solid var(--line)}#entitiesOutput p{margin:8px 0}.result-panel{scroll-margin-top:18px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
+  [hidden]{display:none!important}.step.active{border-color:#168780;background:#eaf9f7;transform:translateX(4px);box-shadow:0 0 0 3px #16878022}.step.done .step-index{background:#168780;color:#fff}.step{transition:all .25s ease}button:disabled{opacity:.6;cursor:wait}#actionsOutput li{padding:8px 0;border-bottom:1px solid var(--line)}#entitiesOutput p{margin:8px 0}.result-panel{scroll-margin-top:18px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:root{--bg:#f7f6f1;--card:#fff;--text:#20251e;--muted:#61685e;--primary:#26372c;--primary-2:#49644d;--accent:#b8ed65;--line:#dce1d7;--shadow:0 10px 34px #2536220c;--radius:20px}
+body{background:#f7f6f1;color:var(--text)}
+.wrap{width:min(1260px,94%);margin:24px auto 60px}
+.hero{background:#182b22;color:#fff;padding:42px 34px;border-radius:24px;box-shadow:none;isolation:isolate}
+.hero:before{width:300px;height:300px;right:-55px;top:-90px;background:#b8ed65;opacity:.22;filter:none}
+.hero:after{width:200px;height:200px;left:auto;right:130px;bottom:-140px;background:#f0bd76;opacity:.28;filter:none}
+.hero h1{font-size:clamp(38px,5vw,62px);letter-spacing:-.055em}
+.hero p{color:#d8e5d9;font-size:16px}.hero .tagline{color:#e5f6c9;background:#ffffff0a}
+.card{border:1px solid var(--line);box-shadow:var(--shadow);padding:26px}
+.card h2{letter-spacing:-.025em;font-size:22px}
+.btn-primary{background:#b8ed65;color:#182b22;box-shadow:0 8px 20px #8bbd4540;border:1px solid #a6d657}
+.btn-primary:hover{background:#a8df54;transform:translateY(-2px)}
+.btn-secondary{background:#f2f4ef;color:#26372c;border-color:#dce1d7}
+select,textarea{background:#fcfdf9;border-color:#cdd5c8}select:focus,textarea:focus{border-color:#6d924b;box-shadow:0 0 0 4px #b8ed6540}
+.mini,.step,.draft-box,.json-box{background:#f7f9f4;border-color:#dce1d7}
+.step-index{background:#e3ebd8;color:#314a2a}.step.active{background:#f0f9df;border-color:#85ac4f;box-shadow:0 0 0 3px #b8ed6533}.step.done .step-index{background:#42643a;color:white}
+.spinner{border-color:#e0e9d7;border-top-color:#52763d}
+.security{background:#f4e9fa;color:#6c3985;border-color:#e1c8ec}.cloud{background:#e9f3ee;color:#306547;border-color:#c8dfd0}.meetings{background:#e8f1d5;color:#405b1e;border-color:#d2e3b1}.proposals{background:#fff0d8;color:#855015;border-color:#ebd2a5}.automation{background:#f7e9e3;color:#914e32;border-color:#eac9ba}.out_of_scope{background:#efefeb;color:#5d625a;border-color:#d5d8d0}
+.critical{background:#ffe5e2;color:#9e2525;border-color:#f0b7b0}.normal{background:#fff2cc;color:#795200;border-color:#e9d69c}.low{background:#e6f4df;color:#396231;border-color:#c9e5bb}
+.progress{background:#e4e9df}.progress>span{background:#86ae53}
+#actionsOutput li::marker{color:#52763d;font-weight:bold}
+#draftOutput{font-size:16px}#results>.grid{align-items:stretch}
+.hero::before,.hero::after{z-index:-1}
+@media(max-width:600px){.hero{padding:28px 22px}.card{padding:18px}.wrap{width:94%}}
+</style>
 </head>
 <body>
   <div class="wrap">
     <section class="hero">
-      <h1>DanaShift / NLP</h1>
-      <p>Multilingual customer-support workflow sandbox for technical consulting requests.</p>
+      <h1>DanaShift<span style="color:#b8ed65">.</span></h1>
+      <p>Intelligent customer support · Arabic &amp; English</p>
       <p>Applied NLP Program · SDAIA Academy</p>
       <div class="tagline">Interactive prototype · Rule-based analysis · Human review required</div>
     </section>
@@ -362,14 +387,14 @@
         <p class="sub">Choose a sample or enter your own synthetic request. Do not use real personal data.</p>
 
         <label for="sample">Quick sample</label>
-        <select id="sample">
-          <option value="فيه أحد حاول يدخل على إيميلاتنا">فيه أحد حاول يدخل على إيميلاتنا</option>
-          <option value="النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة">النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة</option>
-          <option value="أحتاج موعد مع المهندس سلطان بكرة العصر">أحتاج موعد مع المهندس سلطان بكرة العصر</option>
-          <option value="Please send the final proposal and budget details">Please send the final proposal and budget details</option>
-          <option value="وش صار على مشروع الأتمتة؟">وش صار على مشروع الأتمتة؟</option>
-          <option value="وش أفضل مطعم في الرياض؟">وش أفضل مطعم في الرياض؟</option>
-        </select>
+        <select id="sample" dir="auto">
+<option>فيه أحد حاول يدخل على إيميلاتنا</option>
+<option>أبغى أعدل عرض السعر لأنه أعلى من ميزانيتنا</option>
+<option>أحتاج موعد مع المهندس سلطان بكرة العصر</option>
+<option>Please send the final proposal and budget details</option>
+<option>وش صار على مشروع الأتمتة؟</option>
+<option>أبغى خدمة تصميم داخلي للمكتب</option>
+</select>
 
         <label for="request">Customer request</label>
         <textarea id="request">فيه أحد حاول يدخل على إيميلاتنا</textarea>
