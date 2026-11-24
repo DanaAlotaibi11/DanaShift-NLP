@@ -1,1 +1,760 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DanaShift NLP | Demo</title><style>body{font:16px system-ui;background:#edf2f7;color:#182b40;margin:0}main{max-width:900px;margin:auto;padding:36px 20px}header{background:#102b40;color:white;padding:25px;border-radius:16px}section{background:white;padding:24px;border-radius:12px;margin:18px 0}textarea,select{box-sizing:border-box;width:100%;padding:12px;font:inherit;margin:8px 0;border:1px solid #bccbd5;border-radius:8px}button{background:#087e82;color:white;border:0;padding:12px 20px;border-radius:8px;font:inherit;cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f5f8;padding:16px;border-radius:8px}small{color:#456}</style><main><header><h1>DanaShift / NLP</h1><p>Applied NLP Program · SDAIA Academy</p><p>Customer support workflow sandbox</p></header><section><strong>Simulation only — no live models or external tools</strong><p>Choose a sample or enter a synthetic request. Never enter real personal data.</p><select id="sample"><option>فيه أحد حاول يدخل على إيميلاتنا</option><option>أحتاج موعد مع المهندس سلطان</option><option>وش صار على مشروع الأتمتة؟</option><option>Please send the final proposal</option><option>Our server is down</option><option>What is your favorite movie?</option></select><textarea id="request" rows="4"></textarea><button id="run">Analyze request</button></section><section><h2>Review workspace</h2><p>All outputs require staff review. No customer messages are sent.</p><pre id="output" aria-live="polite">Select a request to begin.</pre></section></main><script>const s=document.getElementById('sample'),r=document.getElementById('request'),o=document.getElementById('output');r.value=s.value;s.onchange=()=>r.value=s.value;document.getElementById('run').onclick=()=>{let t=r.value.replace(/\b[A-Z]{2}\d{2}[A-Z0-9 ]{10,30}\b/gi,'[IBAN]').replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi,'[EMAIL]').replace(/(?:\+966|00966|0)5\d{8}/g,'[PHONE]').replace(/\b[12]\d{9}\b/g,'[NATIONAL_ID]');let rules=[['security',/اختراق|إيميلات|امن|أمن|breach|hack|security/i],['proposals',/عرض|سعر|proposal|quote/i],['meetings',/موعد|اجتماع|meeting/i],['automation',/أتمتة|اتمتة|automation/i],['cloud',/سحابة|سيرفر|cloud|server/i]],hits=rules.filter(x=>x[1].test(t)),c=hits[0]?.[0]||'out_of_scope',critical=/اختراق|حاول يدخل|تسرّب|breach|hack|server is down|توقف نظام كامل/i.test(t),review=hits.length!==1,ar=/[\u0600-\u06ff]/.test(t),actions={security:critical?['search_knowledge','alert_team','create_ticket','update_crm']:['search_knowledge','create_ticket','update_crm'],cloud:['search_knowledge','create_ticket','update_crm'],meetings:['search_knowledge','check_calendar','book_meeting (conditional)','update_crm'],automation:['search_knowledge','get_project_status','update_crm'],proposals:['search_knowledge','get_proposal','create_ticket','update_crm'],out_of_scope:[]};o.textContent=JSON.stringify({masked_request:t,category:c,priority:critical?'critical':c==='out_of_scope'?'low':'normal',confidence:null,entities:{PER:[],ORG:[],LOC:[],DATE:[]},actions_taken:[],planned_actions:review?[]:actions[c],draft_reply:ar?(c==='out_of_scope'?'نعتذر، نقدم خدمات الاستشارات التقنية والسحابة والأمن والأتمتة.':'شكراً لتواصلك. يحتاج الفريق المختص إلى مراجعة طلبك والتأكيد.'):(c==='out_of_scope'?'Sorry, we provide technical consulting, cloud, security and automation services.':'Thank you for contacting us. Our team will review your request and confirm details.'),sources:[],needs_review:true,review_reason:'Rule-based sandbox; no calibrated confidence, entity model, verified knowledge or live tools.'},null,2)};</script></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DanaShift | Live Demo</title>
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --card:#ffffff;
+      --text:#17324a;
+      --muted:#5d7287;
+      --primary:#0f3a5a;
+      --primary-2:#135f73;
+      --accent:#12a3a6;
+      --line:#d7e0ea;
+      --success:#1f9d55;
+      --danger:#d64545;
+      --warning:#d98a00;
+      --shadow:0 18px 40px rgba(14, 41, 66, 0.10);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg,#f4f8fb 0%, #edf3f8 100%);
+      color:var(--text);
+    }
+
+    .wrap{
+      width:min(1180px, 92%);
+      margin:28px auto 60px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      padding:32px 28px;
+      border-radius:28px;
+      background:linear-gradient(135deg, #0d2d47 0%, #103f63 55%, #14687c 100%);
+      color:white;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+
+    .hero::before,
+    .hero::after{
+      content:"";
+      position:absolute;
+      border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      filter:blur(2px);
+      animation: float 7s ease-in-out infinite;
+    }
+    .hero::before{
+      width:180px;height:180px;right:-30px;top:-30px;
+    }
+    .hero::after{
+      width:120px;height:120px;left:55%;bottom:-40px;animation-delay:1.2s;
+    }
+
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+      font-size:clamp(30px, 4vw, 52px);
+      line-height:1.05;
+      letter-spacing:-0.02em;
+    }
+
+    .hero p{
+      margin:8px 0;
+      color:rgba(255,255,255,0.9);
+      max-width:700px;
+      font-size:18px;
+    }
+
+    .hero .tagline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.15);
+      font-size:14px;
+      margin-top:10px;
+      backdrop-filter:blur(8px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid rgba(18,53,82,0.07);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .card h2{
+      margin:0 0 8px;
+      font-size:20px;
+    }
+
+    .sub{
+      color:var(--muted);
+      margin:0 0 18px;
+      line-height:1.6;
+      font-size:14.5px;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin:14px 0 8px;
+      color:var(--text);
+    }
+
+    select, textarea{
+      width:100%;
+      border:1px solid #cfd9e3;
+      border-radius:16px;
+      padding:14px 15px;
+      font:inherit;
+      color:var(--text);
+      background:#fbfdff;
+      transition:.22s ease;
+      outline:none;
+    }
+
+    select:focus, textarea:focus{
+      border-color:#5ea3cc;
+      box-shadow:0 0 0 4px rgba(46, 121, 178, 0.12);
+      background:white;
+    }
+
+    textarea{
+      min-height:150px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:16px;
+    }
+
+    button{
+      border:none;
+      border-radius:16px;
+      padding:13px 18px;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .16s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, #0f7f87 0%, #14687c 100%);
+      color:white;
+      box-shadow:0 10px 24px rgba(15,127,135,0.22);
+    }
+
+    .btn-primary:hover{ transform:translateY(-1px); }
+    .btn-secondary{
+      background:#eff5fa;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .status-bar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .mini{
+      flex:1 1 130px;
+      background:linear-gradient(180deg,#fbfdff,#f3f7fb);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-width:120px;
+    }
+
+    .mini .k{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .mini .v{
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      border:1px solid transparent;
+    }
+
+    .critical{background:#fff0f0;color:#b53c3c;border-color:#f3c6c6}
+    .normal{background:#fff8e9;color:#9b6500;border-color:#f0d8a1}
+    .low{background:#eefaf3;color:#1b7c4b;border-color:#bde4cc}
+    .security{background:#eff6ff;color:#215caa;border-color:#c9dcff}
+    .cloud{background:#eefcff;color:#0d7188;border-color:#bfeaf3}
+    .meetings{background:#f6f1ff;color:#6d43bf;border-color:#d8caf8}
+    .proposals{background:#fff3ea;color:#b7611d;border-color:#f1cfb0}
+    .automation{background:#edfbf7;color:#0d8b67;border-color:#b8eadb}
+    .out_of_scope{background:#f3f5f7;color:#5f6d7b;border-color:#d7dee6}
+
+    .result-panel{
+      opacity:0;
+      transform:translateY(14px);
+      transition: .35s ease;
+    }
+    .result-panel.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .loading{
+      display:none;
+      align-items:center;
+      gap:10px;
+      margin-top:14px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .loading.show{display:flex}
+
+    .spinner{
+      width:18px;height:18px;border-radius:999px;
+      border:3px solid #d7e7eb;
+      border-top-color:var(--accent);
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .json-box{
+      background:#f5f8fc;
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:14px;
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+      max-height:420px;
+    }
+
+    .draft-box{
+      background:linear-gradient(180deg,#fcfeff,#f6fbff);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      line-height:1.8;
+      white-space:pre-wrap;
+    }
+
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .timeline{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .step{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:16px;
+      padding:12px 14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .step-index{
+      width:28px;height:28px;border-radius:999px;
+      background:#dff3f1;
+      color:#0d756a;
+      display:grid;place-items:center;
+      font-size:13px;font-weight:800;
+      flex-shrink:0;
+    }
+
+    .progress{
+      height:10px;
+      background:#e8eef4;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+
+    .progress > span{
+      display:block;
+      height:100%;
+      width:0;
+      border-radius:999px;
+      background:linear-gradient(90deg,#1a8b9a,#2b71d7);
+      transition:width .6s ease;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>DanaShift / NLP</h1>
+      <p>Multilingual customer-support workflow sandbox for technical consulting requests.</p>
+      <p>Applied NLP Program · SDAIA Academy</p>
+      <div class="tagline">Simulation only · Human review required before any reply</div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Request Analysis</h2>
+        <p class="sub">Choose a sample or enter your own synthetic request. Do not use real personal data.</p>
+
+        <label for="sample">Quick sample</label>
+        <select id="sample">
+          <option value="فيه أحد حاول يدخل على إيميلاتنا">فيه أحد حاول يدخل على إيميلاتنا</option>
+          <option value="النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة">النظام طاح بالكامل ونحتاج نقل الاستضافة للسحابة</option>
+          <option value="أحتاج موعد مع المهندس سلطان بكرة العصر">أحتاج موعد مع المهندس سلطان بكرة العصر</option>
+          <option value="Please send the final proposal and budget details">Please send the final proposal and budget details</option>
+          <option value="وش صار على مشروع الأتمتة؟">وش صار على مشروع الأتمتة؟</option>
+          <option value="وش أفضل مطعم في الرياض؟">وش أفضل مطعم في الرياض؟</option>
+        </select>
+
+        <label for="request">Customer request</label>
+        <textarea id="request">فيه أحد حاول يدخل على إيميلاتنا</textarea>
+
+        <div class="row">
+          <button class="btn-primary" id="analyzeBtn">Analyze request</button>
+          <button class="btn-secondary" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <span>Analyzing request and preparing staff review output...</span>
+        </div>
+
+        <div class="status-bar" id="quickStats">
+          <div class="mini">
+            <div class="k">Mode</div>
+            <div class="v">Sandbox</div>
+          </div>
+          <div class="mini">
+            <div class="k">Output</div>
+            <div class="v">JSON + Draft</div>
+          </div>
+          <div class="mini">
+            <div class="k">Review</div>
+            <div class="v">Required</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div>
+            <h2 style="margin:0">Processing Flow</h2>
+            <p class="sub" style="margin-top:8px">A visual walkthrough of what the agent does.</p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="step">
+            <div class="step-index">1</div>
+            <div>
+              <strong>Privacy masking</strong>
+              <div class="small">Emails, phone numbers, IDs and IBANs are masked before downstream handling.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">2</div>
+            <div>
+              <strong>Intent & priority detection</strong>
+              <div class="small">The request is mapped to cloud, security, automation, meetings, proposals or out_of_scope.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">3</div>
+            <div>
+              <strong>Entity extraction</strong>
+              <div class="small">Basic person, organization, location and time expressions are extracted.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-index">4</div>
+            <div>
+              <strong>Actions & draft reply</strong>
+              <div class="small">The sandbox simulates internal actions and drafts a response for staff approval.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card result-panel" id="results" style="margin-top:20px;">
+      <div class="section-title">
+        <div>
+          <h2 style="margin:0">Review Workspace</h2>
+          <p class="sub" style="margin-top:8px">All outputs require staff review. No customer messages are sent.</p>
+        </div>
+        <button class="btn-secondary" id="copyBtn">Copy JSON</button>
+      </div>
+
+      <div class="status-bar" id="badgesRow">
+        <span class="badge security" id="catBadge">Category: security</span>
+        <span class="badge critical" id="priBadge">Priority: critical</span>
+        <span class="badge" id="reviewBadge" style="background:#eef4fb;border-color:#cfdeef;color:#35506a;">needs_review: false</span>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div style="font-weight:700; margin-bottom:8px;">Confidence</div>
+        <div class="progress"><span id="confidenceBar"></span></div>
+        <div class="small" id="confidenceText" style="margin-top:8px;">Confidence: 93%</div>
+      </div>
+
+      <div class="grid" style="margin-top:20px;">
+        <div class="card" style="padding:18px;">
+          <h2 style="font-size:18px;">Structured JSON</h2>
+          <div class="json-box" id="jsonOutput"></div>
+        </div>
+
+        <div class="card" style="padding:18px;">
+          <h2 style="font-size:18px;">Draft Reply</h2>
+          <div class="draft-box" id="draftOutput"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const sample = document.getElementById("sample");
+    const requestBox = document.getElementById("request");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const results = document.getElementById("results");
+    const loading = document.getElementById("loading");
+
+    const jsonOutput = document.getElementById("jsonOutput");
+    const draftOutput = document.getElementById("draftOutput");
+    const catBadge = document.getElementById("catBadge");
+    const priBadge = document.getElementById("priBadge");
+    const reviewBadge = document.getElementById("reviewBadge");
+    const confidenceBar = document.getElementById("confidenceBar");
+    const confidenceText = document.getElementById("confidenceText");
+    const copyBtn = document.getElementById("copyBtn");
+
+    sample.addEventListener("change", () => {
+      requestBox.value = sample.value;
+    });
+
+    clearBtn.addEventListener("click", () => {
+      requestBox.value = "";
+      results.classList.remove("show");
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(jsonOutput.textContent);
+        copyBtn.textContent = "Copied";
+        setTimeout(() => copyBtn.textContent = "Copy JSON", 1200);
+      } catch {
+        copyBtn.textContent = "Copy failed";
+        setTimeout(() => copyBtn.textContent = "Copy JSON", 1200);
+      }
+    });
+
+    function containsAny(text, list){
+      return list.some(item => text.includes(item));
+    }
+
+    function detectLanguage(text){
+      return /[A-Za-z]/.test(text) && !/[ء-ي]/.test(text) ? "en" : "ar";
+    }
+
+    function maskPII(text){
+      return text
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[EMAIL]")
+        .replace(/(?:\+?\d[\d\s-]{7,}\d)/g, "[PHONE]")
+        .replace(/\bSA[0-9A-Z]{10,}\b/gi, "[IBAN]")
+        .replace(/\b\d{10}\b/g, "[NATIONAL_ID]");
+    }
+
+    function extractEntities(text){
+      const PER = [];
+      const ORG = [];
+      const LOC = [];
+      const DATE = [];
+
+      const people = ["أحمد","محمد","سلطان","خالد","Dana","Ahmed","Mohammed","Sultan","Khalid"];
+      const orgs = ["دانا شيفت","DanaShift","شركة النخبة","النخبة"];
+      const locs = ["الرياض","جدة","Riyadh","Jeddah"];
+      const dates = ["اليوم","بكرة","غدًا","غدا","أمس","tomorrow","today","yesterday","next week"];
+
+      people.forEach(p => { if(text.includes(p)) PER.push(p); });
+      orgs.forEach(o => { if(text.includes(o)) ORG.push(o); });
+      locs.forEach(l => { if(text.includes(l)) LOC.push(l); });
+      dates.forEach(d => { if(text.toLowerCase().includes(d.toLowerCase())) DATE.push(d); });
+
+      return { PER, ORG, LOC, DATE };
+    }
+
+    function classify(text){
+      const t = text.toLowerCase();
+
+      if (containsAny(t, ["اختراق","يحاول يدخل","تسرب","تسرّب","تسريب","security","hack","breach","unauthorized","phishing","two-factor","2fa","ايميلاتنا","email attack"])) {
+        return { category:"security", priority: containsAny(t, ["اختراق","تسرب","breach","طاح","unauthorized","يحاول يدخل"]) ? "critical" : "normal", confidence:0.93 };
+      }
+
+      if (containsAny(t, ["سحابة","cloud","استضافة","server","backup","نسخ احتياطي","السيرفر","migration"])) {
+        return { category:"cloud", priority: containsAny(t, ["طاح","down","outage","وقف","stopped"]) ? "critical" : "normal", confidence:0.89 };
+      }
+
+      if (containsAny(t, ["موعد","اجتماع","meeting","schedule","book"])) {
+        return { category:"meetings", priority:"normal", confidence:0.91 };
+      }
+
+      if (containsAny(t, ["عرض","سعر","proposal","budget","quotation","quote","مالي"])) {
+        return { category:"proposals", priority:"normal", confidence:0.9 };
+      }
+
+      if (containsAny(t, ["أتمتة","automation","workflow","وش صار على مشروع","status","project progress"])) {
+        return { category:"automation", priority:"normal", confidence:0.84 };
+      }
+
+      return { category:"out_of_scope", priority:"low", confidence:0.72 };
+    }
+
+    function actionsFor(category, priority, entities){
+      const person = entities.PER[0] || entities.ORG[0] || "client";
+      switch(category){
+        case "security":
+          return [
+            `alert_team(security, urgent security incident reported)`,
+            `create_ticket(security, ${priority}, possible security incident)`,
+            `search_knowledge(security incident response)`,
+            `update_crm(${person}, entities)`
+          ];
+        case "cloud":
+          return [
+            `create_ticket(cloud, ${priority}, cloud or infrastructure request)`,
+            `search_knowledge(cloud migration / outage handling)`,
+            `update_crm(${person}, entities)`
+          ];
+        case "meetings":
+          return [
+            `check_calendar(engineer, requested date if available)`,
+            `book_meeting(engineer, nearest matching slot, client)`,
+            `update_crm(${person}, entities)`
+          ];
+        case "proposals":
+          return [
+            `get_proposal(client)`,
+            `create_ticket(sales, normal, pricing / proposal follow-up)`,
+            `update_crm(${person}, entities)`
+          ];
+        case "automation":
+          return [
+            `get_project_status(project_name)`,
+            `search_knowledge(project status communication)`,
+            `update_crm(${person}, entities)`
+          ];
+        default:
+          return [];
+      }
+    }
+
+    function sourcesFor(category){
+      const map = {
+        security:["Incident Response Playbook v2.1","Case #318"],
+        cloud:["Cloud Migration Playbook","Case #204"],
+        meetings:["Scheduling SOP v1.3"],
+        proposals:["Proposal Handling Guide","Sales Workflow SOP"],
+        automation:["Project Update Communication Guide","Case #411"],
+        out_of_scope:[]
+      };
+      return map[category] || [];
+    }
+
+    function buildDraft(category, priority, lang, entities){
+      const name = entities.PER[0] ? (lang === "ar" ? `أستاذ ${entities.PER[0]}` : `Mr./Ms. ${entities.PER[0]}`) : (lang === "ar" ? "عميلنا الكريم" : "Dear client");
+
+      if(lang === "en"){
+        const drafts = {
+          security: `${name},\n\nThank you for reaching out. Your request has been classified as a critical security matter and has been escalated to the cybersecurity team for immediate review.\n\nAs an immediate precaution, we recommend changing affected passwords and enabling two-factor authentication where possible. A specialist will contact you shortly.\n\nDanaShift Team`,
+          cloud: `${name},\n\nThank you for your message. Your cloud/infrastructure request has been logged and routed to the cloud team for review. The team will confirm the next steps and timeline shortly.\n\nDanaShift Team`,
+          meetings: `${name},\n\nThank you for your request. We are reviewing the engineer availability and will confirm the nearest suitable meeting slot shortly.\n\nDanaShift Team`,
+          proposals: `${name},\n\nThank you for your request. We are reviewing the latest proposal information and have routed your request to the sales team for confirmation.\n\nDanaShift Team`,
+          automation: `${name},\n\nThank you for your message. We are reviewing the project status and will share an updated summary with you shortly.\n\nDanaShift Team`,
+          out_of_scope: `${name},\n\nThank you for your message. This request appears to fall outside DanaShift's current service scope. We currently support cloud, security, automation, meetings, and proposal-related requests.\n\nDanaShift Team`
+        };
+        return drafts[category];
+      }
+
+      const drafts = {
+        security: `${name}،\n\nشكرًا لتواصلك. تم تصنيف طلبك كحالة أمنية حرجة وتم تصعيده مباشرة إلى فريق الأمن السيبراني للمراجعة العاجلة.\n\nكإجراء احترازي فوري، نوصي بتغيير كلمات المرور للحسابات المتأثرة وتفعيل التحقق الثنائي إن أمكن. سيتواصل معك المختص في أقرب وقت.\n\nفريق دانا شيفت`,
+        cloud: `${name}،\n\nشكرًا لتواصلك. تم تسجيل طلبك وتحويله إلى فريق السحابة والبنية التحتية للمراجعة. وسيتم تأكيد الخطوات القادمة والمدة المتوقعة معك قريبًا.\n\nفريق دانا شيفت`,
+        meetings: `${name}،\n\nشكرًا لتواصلك. جارٍ التحقق من توفر المهندس والبحث عن أقرب موعد مناسب بما يتوافق مع طلبك، وسيتم تأكيد الموعد معك قريبًا.\n\nفريق دانا شيفت`,
+        proposals: `${name}،\n\nشكرًا لتواصلك. جارٍ مراجعة آخر عرض سعر أو عرض فني متاح، وتم تحويل الطلب إلى فريق المبيعات للتأكيد والمتابعة.\n\nفريق دانا شيفت`,
+        automation: `${name}،\n\nشكرًا لتواصلك. جارٍ مراجعة حالة مشروع الأتمتة وتجهيز تحديث واضح لمشاركته معك في أقرب وقت.\n\nفريق دانا شيفت`,
+        out_of_scope: `${name}،\n\nشكرًا لتواصلك. يبدو أن الطلب خارج نطاق خدمات دانا شيفت الحالية. نحن ندعم حاليًا طلبات السحابة، الأمن السيبراني، الأتمتة، الاجتماعات، وعروض الأسعار.\n\nفريق دانا شيفت`
+      };
+      return drafts[category];
+    }
+
+    function buildOutput(text){
+      const masked = maskPII(text);
+      const lang = detectLanguage(text);
+      const entities = extractEntities(text);
+      const cls = classify(text);
+
+      let needsReview = false;
+      let reviewReason = "";
+
+      if(cls.confidence < 0.7){
+        needsReview = true;
+        reviewReason = "Low classification confidence.";
+      }
+
+      const sources = sourcesFor(cls.category);
+      const actions = actionsFor(cls.category, cls.priority, entities);
+      const draft = buildDraft(cls.category, cls.priority, lang, entities);
+
+      return {
+        category: cls.category,
+        priority: cls.priority,
+        confidence: Number(cls.confidence.toFixed(2)),
+        entities,
+        actions_taken: actions,
+        draft_reply: draft,
+        sources,
+        needs_review: needsReview,
+        review_reason: reviewReason,
+        masked_request: masked
+      };
+    }
+
+    function setBadge(el, label, value){
+      el.textContent = `${label}: ${value}`;
+      el.className = "badge " + value;
+    }
+
+    analyzeBtn.addEventListener("click", () => {
+      const text = requestBox.value.trim();
+      if(!text){
+        requestBox.focus();
+        return;
+      }
+
+      loading.classList.add("show");
+      results.classList.remove("show");
+
+      setTimeout(() => {
+        const output = buildOutput(text);
+
+        jsonOutput.textContent = JSON.stringify({
+          category: output.category,
+          priority: output.priority,
+          confidence: output.confidence,
+          entities: output.entities,
+          actions_taken: output.actions_taken,
+          draft_reply: output.draft_reply,
+          sources: output.sources,
+          needs_review: output.needs_review,
+          review_reason: output.review_reason
+        }, null, 2);
+
+        draftOutput.textContent = output.draft_reply;
+
+        setBadge(catBadge, "Category", output.category);
+        setBadge(priBadge, "Priority", output.priority);
+
+        reviewBadge.textContent = `needs_review: ${output.needs_review}`;
+        reviewBadge.className = "badge";
+        reviewBadge.style.background = output.needs_review ? "#fff5e8" : "#eef4fb";
+        reviewBadge.style.borderColor = output.needs_review ? "#f2d4a2" : "#cfdeef";
+        reviewBadge.style.color = output.needs_review ? "#9b6500" : "#35506a";
+
+        const conf = Math.round((output.confidence || 0) * 100);
+        confidenceBar.style.width = conf + "%";
+        confidenceText.textContent = `Confidence: ${conf}%`;
+
+        loading.classList.remove("show");
+        results.classList.add("show");
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 950);
+    });
+
+    // initial view
+    (() => {
+      const initial = buildOutput(requestBox.value);
+      jsonOutput.textContent = JSON.stringify({
+        category: initial.category,
+        priority: initial.priority,
+        confidence: initial.confidence,
+        entities: initial.entities,
+        actions_taken: initial.actions_taken,
+        draft_reply: initial.draft_reply,
+        sources: initial.sources,
+        needs_review: initial.needs_review,
+        review_reason: initial.review_reason
+      }, null, 2);
+      draftOutput.textContent = initial.draft_reply;
+      setBadge(catBadge, "Category", initial.category);
+      setBadge(priBadge, "Priority", initial.priority);
+      confidenceBar.style.width = Math.round(initial.confidence * 100) + "%";
+      confidenceText.textContent = `Confidence: ${Math.round(initial.confidence * 100)}%`;
+      results.classList.add("show");
+    })();
+  </script>
+</body>
+</html>
