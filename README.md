@@ -10,7 +10,7 @@
 
 `Arabic & English` &nbsp; `Applied NLP` &nbsp; `Human-in-the-loop`
 
-Developed as part of the **Applied Natural Language Processing Program** at **SDAIA Academy**, affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
+Developed as part of the **Applied Natural Language Processing Program** at **@SDAIAAcademy** (SDAIA Academy), affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
 
 </div>
 
@@ -112,6 +112,6 @@ These observations come from saved notebook experiments and small illustrative s
 
 ## Acknowledgments
 
-SDAIA Academy — Applied Natural Language Processing Program, Saudi Data and Artificial Intelligence Authority (SDAIA).
+@SDAIAAcademy — Applied Natural Language Processing Program, Saudi Data and Artificial Intelligence Authority (SDAIA).
 
 
