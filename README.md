@@ -6,7 +6,7 @@ Developed as part of the **Applied Natural Language Processing Program** offered
 ## Overview
 DanaShift combines privacy-aware text preprocessing, Arabic language modeling, intent classification, entity annotation, semantic retrieval and human-supervised customer support workflows.
 
-## Course experiments
+## Experimental methodology
 | Lab | Focus | Recorded result |
 |---|---|---|
 | 1 | Normalization, PII masking, multilingual tokenization | Arabic fertility 3.32; English 1.95; p95 length 36.5; UNK rate 0.0058 |
@@ -31,6 +31,10 @@ flowchart TD
  G --> H
  H --> I[Human review]
 ```
+
+## Project notebook
+
+[**Open DanaShift.ipynb**](DanaShift.ipynb) — unified project explanation, code, saved experimental results and original Colab figures.
 
 ## Repository guide
 - [Experiment notes](docs/experiments.md)
