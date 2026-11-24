@@ -345,7 +345,7 @@
     }
 
     .hidden{display:none}
-  </style>
+  [hidden]{display:none!important}.step.active{border-color:#168780;background:#eaf9f7;transform:translateX(4px);box-shadow:0 0 0 3px #16878022}.step.done .step-index{background:#168780;color:#fff}.step{transition:all .25s ease}button:disabled{opacity:.6;cursor:wait}#actionsOutput li{padding:8px 0;border-bottom:1px solid var(--line)}#entitiesOutput p{margin:8px 0}.result-panel{scroll-margin-top:18px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}</style>
 </head>
 <body>
   <div class="wrap">
@@ -353,7 +353,7 @@
       <h1>DanaShift / NLP</h1>
       <p>Multilingual customer-support workflow sandbox for technical consulting requests.</p>
       <p>Applied NLP Program · SDAIA Academy</p>
-      <div class="tagline">Simulation only · Human review required before any reply</div>
+      <div class="tagline">Interactive prototype · Rule-based analysis · Human review required</div>
     </section>
 
     <div class="grid">
@@ -381,10 +381,10 @@
 
         <div class="loading" id="loading">
           <div class="spinner"></div>
-          <span>Analyzing request and preparing staff review output...</span>
+          <span><span id="stageText">Preparing request…</span></span>
         </div>
 
-        <div class="status-bar" id="quickStats">
+        <p id="message" role="status" class="small"></p><div class="status-bar" id="quickStats">
           <div class="mini">
             <div class="k">Mode</div>
             <div class="v">Sandbox</div>
@@ -427,14 +427,14 @@
             <div class="step-index">3</div>
             <div>
               <strong>Entity extraction</strong>
-              <div class="small">Basic person, organization, location and time expressions are extracted.</div>
+              <div class="small">Example names, organizations, locations and dates are matched using a small dictionary.</div>
             </div>
           </div>
           <div class="step">
             <div class="step-index">4</div>
             <div>
               <strong>Actions & draft reply</strong>
-              <div class="small">The sandbox simulates internal actions and drafts a response for staff approval.</div>
+              <div class="small">Suggested actions and a template reply are prepared. No tools are called.</div>
             </div>
           </div>
         </div>
@@ -453,19 +453,18 @@
       <div class="status-bar" id="badgesRow">
         <span class="badge security" id="catBadge">Category: security</span>
         <span class="badge critical" id="priBadge">Priority: critical</span>
-        <span class="badge" id="reviewBadge" style="background:#eef4fb;border-color:#cfdeef;color:#35506a;">needs_review: false</span>
+        <span class="badge" id="reviewBadge" style="background:#eef4fb;border-color:#cfdeef;color:#35506a;">Staff review required</span>
       </div>
 
       <div style="margin-top:18px;">
         <div style="font-weight:700; margin-bottom:8px;">Confidence</div>
         <div class="progress"><span id="confidenceBar"></span></div>
-        <div class="small" id="confidenceText" style="margin-top:8px;">Confidence: 93%</div>
+        <div class="small" id="confidenceText" style="margin-top:8px;">Not available — rule-based preview</div>
       </div>
 
-      <div class="grid" style="margin-top:20px;">
+      <div class="grid" style="margin-top:20px;"><div class="card" style="padding:18px"><h2>Privacy-safe request</h2><div id="maskedOutput" class="draft-box"></div><h2 style="margin-top:16px">Detected entities</h2><div id="entitiesOutput"></div></div><div class="card" style="padding:18px"><h2>Suggested next steps</h2><p class="small">Proposed only — not executed.</p><ol id="actionsOutput"></ol><p id="reason" class="small"></p></div>
         <div class="card" style="padding:18px;">
-          <h2 style="font-size:18px;">Structured JSON</h2>
-          <div class="json-box" id="jsonOutput"></div>
+          <details><summary style="cursor:pointer;font-weight:700">Developer view · JSON</summary><pre class="json-box" id="jsonOutput"></pre></details>
         </div>
 
         <div class="card" style="padding:18px;">
@@ -477,284 +476,38 @@
   </div>
 
   <script>
-    const sample = document.getElementById("sample");
-    const requestBox = document.getElementById("request");
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const results = document.getElementById("results");
-    const loading = document.getElementById("loading");
-
-    const jsonOutput = document.getElementById("jsonOutput");
-    const draftOutput = document.getElementById("draftOutput");
-    const catBadge = document.getElementById("catBadge");
-    const priBadge = document.getElementById("priBadge");
-    const reviewBadge = document.getElementById("reviewBadge");
-    const confidenceBar = document.getElementById("confidenceBar");
-    const confidenceText = document.getElementById("confidenceText");
-    const copyBtn = document.getElementById("copyBtn");
-
-    sample.addEventListener("change", () => {
-      requestBox.value = sample.value;
-    });
-
-    clearBtn.addEventListener("click", () => {
-      requestBox.value = "";
-      results.classList.remove("show");
-    });
-
-    copyBtn.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(jsonOutput.textContent);
-        copyBtn.textContent = "Copied";
-        setTimeout(() => copyBtn.textContent = "Copy JSON", 1200);
-      } catch {
-        copyBtn.textContent = "Copy failed";
-        setTimeout(() => copyBtn.textContent = "Copy JSON", 1200);
-      }
-    });
-
-    function containsAny(text, list){
-      return list.some(item => text.includes(item));
-    }
-
-    function detectLanguage(text){
-      return /[A-Za-z]/.test(text) && !/[ء-ي]/.test(text) ? "en" : "ar";
-    }
-
-    function maskPII(text){
-      return text
-        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[EMAIL]")
-        .replace(/(?:\+?\d[\d\s-]{7,}\d)/g, "[PHONE]")
-        .replace(/\bSA[0-9A-Z]{10,}\b/gi, "[IBAN]")
-        .replace(/\b\d{10}\b/g, "[NATIONAL_ID]");
-    }
-
-    function extractEntities(text){
-      const PER = [];
-      const ORG = [];
-      const LOC = [];
-      const DATE = [];
-
-      const people = ["أحمد","محمد","سلطان","خالد","Dana","Ahmed","Mohammed","Sultan","Khalid"];
-      const orgs = ["دانا شيفت","DanaShift","شركة النخبة","النخبة"];
-      const locs = ["الرياض","جدة","Riyadh","Jeddah"];
-      const dates = ["اليوم","بكرة","غدًا","غدا","أمس","tomorrow","today","yesterday","next week"];
-
-      people.forEach(p => { if(text.includes(p)) PER.push(p); });
-      orgs.forEach(o => { if(text.includes(o)) ORG.push(o); });
-      locs.forEach(l => { if(text.includes(l)) LOC.push(l); });
-      dates.forEach(d => { if(text.toLowerCase().includes(d.toLowerCase())) DATE.push(d); });
-
-      return { PER, ORG, LOC, DATE };
-    }
-
-    function classify(text){
-      const t = text.toLowerCase();
-
-      if (containsAny(t, ["اختراق","يحاول يدخل","تسرب","تسرّب","تسريب","security","hack","breach","unauthorized","phishing","two-factor","2fa","ايميلاتنا","email attack"])) {
-        return { category:"security", priority: containsAny(t, ["اختراق","تسرب","breach","طاح","unauthorized","يحاول يدخل"]) ? "critical" : "normal", confidence:0.93 };
-      }
-
-      if (containsAny(t, ["سحابة","cloud","استضافة","server","backup","نسخ احتياطي","السيرفر","migration"])) {
-        return { category:"cloud", priority: containsAny(t, ["طاح","down","outage","وقف","stopped"]) ? "critical" : "normal", confidence:0.89 };
-      }
-
-      if (containsAny(t, ["موعد","اجتماع","meeting","schedule","book"])) {
-        return { category:"meetings", priority:"normal", confidence:0.91 };
-      }
-
-      if (containsAny(t, ["عرض","سعر","proposal","budget","quotation","quote","مالي"])) {
-        return { category:"proposals", priority:"normal", confidence:0.9 };
-      }
-
-      if (containsAny(t, ["أتمتة","automation","workflow","وش صار على مشروع","status","project progress"])) {
-        return { category:"automation", priority:"normal", confidence:0.84 };
-      }
-
-      return { category:"out_of_scope", priority:"low", confidence:0.72 };
-    }
-
-    function actionsFor(category, priority, entities){
-      const person = entities.PER[0] || entities.ORG[0] || "client";
-      switch(category){
-        case "security":
-          return [
-            `alert_team(security, urgent security incident reported)`,
-            `create_ticket(security, ${priority}, possible security incident)`,
-            `search_knowledge(security incident response)`,
-            `update_crm(${person}, entities)`
-          ];
-        case "cloud":
-          return [
-            `create_ticket(cloud, ${priority}, cloud or infrastructure request)`,
-            `search_knowledge(cloud migration / outage handling)`,
-            `update_crm(${person}, entities)`
-          ];
-        case "meetings":
-          return [
-            `check_calendar(engineer, requested date if available)`,
-            `book_meeting(engineer, nearest matching slot, client)`,
-            `update_crm(${person}, entities)`
-          ];
-        case "proposals":
-          return [
-            `get_proposal(client)`,
-            `create_ticket(sales, normal, pricing / proposal follow-up)`,
-            `update_crm(${person}, entities)`
-          ];
-        case "automation":
-          return [
-            `get_project_status(project_name)`,
-            `search_knowledge(project status communication)`,
-            `update_crm(${person}, entities)`
-          ];
-        default:
-          return [];
-      }
-    }
-
-    function sourcesFor(category){
-      const map = {
-        security:["Incident Response Playbook v2.1","Case #318"],
-        cloud:["Cloud Migration Playbook","Case #204"],
-        meetings:["Scheduling SOP v1.3"],
-        proposals:["Proposal Handling Guide","Sales Workflow SOP"],
-        automation:["Project Update Communication Guide","Case #411"],
-        out_of_scope:[]
-      };
-      return map[category] || [];
-    }
-
-    function buildDraft(category, priority, lang, entities){
-      const name = entities.PER[0] ? (lang === "ar" ? `أستاذ ${entities.PER[0]}` : `Mr./Ms. ${entities.PER[0]}`) : (lang === "ar" ? "عميلنا الكريم" : "Dear client");
-
-      if(lang === "en"){
-        const drafts = {
-          security: `${name},\n\nThank you for reaching out. Your request has been classified as a critical security matter and has been escalated to the cybersecurity team for immediate review.\n\nAs an immediate precaution, we recommend changing affected passwords and enabling two-factor authentication where possible. A specialist will contact you shortly.\n\nDanaShift Team`,
-          cloud: `${name},\n\nThank you for your message. Your cloud/infrastructure request has been logged and routed to the cloud team for review. The team will confirm the next steps and timeline shortly.\n\nDanaShift Team`,
-          meetings: `${name},\n\nThank you for your request. We are reviewing the engineer availability and will confirm the nearest suitable meeting slot shortly.\n\nDanaShift Team`,
-          proposals: `${name},\n\nThank you for your request. We are reviewing the latest proposal information and have routed your request to the sales team for confirmation.\n\nDanaShift Team`,
-          automation: `${name},\n\nThank you for your message. We are reviewing the project status and will share an updated summary with you shortly.\n\nDanaShift Team`,
-          out_of_scope: `${name},\n\nThank you for your message. This request appears to fall outside DanaShift's current service scope. We currently support cloud, security, automation, meetings, and proposal-related requests.\n\nDanaShift Team`
-        };
-        return drafts[category];
-      }
-
-      const drafts = {
-        security: `${name}،\n\nشكرًا لتواصلك. تم تصنيف طلبك كحالة أمنية حرجة وتم تصعيده مباشرة إلى فريق الأمن السيبراني للمراجعة العاجلة.\n\nكإجراء احترازي فوري، نوصي بتغيير كلمات المرور للحسابات المتأثرة وتفعيل التحقق الثنائي إن أمكن. سيتواصل معك المختص في أقرب وقت.\n\nفريق دانا شيفت`,
-        cloud: `${name}،\n\nشكرًا لتواصلك. تم تسجيل طلبك وتحويله إلى فريق السحابة والبنية التحتية للمراجعة. وسيتم تأكيد الخطوات القادمة والمدة المتوقعة معك قريبًا.\n\nفريق دانا شيفت`,
-        meetings: `${name}،\n\nشكرًا لتواصلك. جارٍ التحقق من توفر المهندس والبحث عن أقرب موعد مناسب بما يتوافق مع طلبك، وسيتم تأكيد الموعد معك قريبًا.\n\nفريق دانا شيفت`,
-        proposals: `${name}،\n\nشكرًا لتواصلك. جارٍ مراجعة آخر عرض سعر أو عرض فني متاح، وتم تحويل الطلب إلى فريق المبيعات للتأكيد والمتابعة.\n\nفريق دانا شيفت`,
-        automation: `${name}،\n\nشكرًا لتواصلك. جارٍ مراجعة حالة مشروع الأتمتة وتجهيز تحديث واضح لمشاركته معك في أقرب وقت.\n\nفريق دانا شيفت`,
-        out_of_scope: `${name}،\n\nشكرًا لتواصلك. يبدو أن الطلب خارج نطاق خدمات دانا شيفت الحالية. نحن ندعم حاليًا طلبات السحابة، الأمن السيبراني، الأتمتة، الاجتماعات، وعروض الأسعار.\n\nفريق دانا شيفت`
-      };
-      return drafts[category];
-    }
-
-    function buildOutput(text){
-      const masked = maskPII(text);
-      const lang = detectLanguage(text);
-      const entities = extractEntities(text);
-      const cls = classify(text);
-
-      let needsReview = false;
-      let reviewReason = "";
-
-      if(cls.confidence < 0.7){
-        needsReview = true;
-        reviewReason = "Low classification confidence.";
-      }
-
-      const sources = sourcesFor(cls.category);
-      const actions = actionsFor(cls.category, cls.priority, entities);
-      const draft = buildDraft(cls.category, cls.priority, lang, entities);
-
-      return {
-        category: cls.category,
-        priority: cls.priority,
-        confidence: Number(cls.confidence.toFixed(2)),
-        entities,
-        actions_taken: actions,
-        draft_reply: draft,
-        sources,
-        needs_review: needsReview,
-        review_reason: reviewReason,
-        masked_request: masked
-      };
-    }
-
-    function setBadge(el, label, value){
-      el.textContent = `${label}: ${value}`;
-      el.className = "badge " + value;
-    }
-
-    analyzeBtn.addEventListener("click", () => {
-      const text = requestBox.value.trim();
-      if(!text){
-        requestBox.focus();
-        return;
-      }
-
-      loading.classList.add("show");
-      results.classList.remove("show");
-
-      setTimeout(() => {
-        const output = buildOutput(text);
-
-        jsonOutput.textContent = JSON.stringify({
-          category: output.category,
-          priority: output.priority,
-          confidence: output.confidence,
-          entities: output.entities,
-          actions_taken: output.actions_taken,
-          draft_reply: output.draft_reply,
-          sources: output.sources,
-          needs_review: output.needs_review,
-          review_reason: output.review_reason
-        }, null, 2);
-
-        draftOutput.textContent = output.draft_reply;
-
-        setBadge(catBadge, "Category", output.category);
-        setBadge(priBadge, "Priority", output.priority);
-
-        reviewBadge.textContent = `needs_review: ${output.needs_review}`;
-        reviewBadge.className = "badge";
-        reviewBadge.style.background = output.needs_review ? "#fff5e8" : "#eef4fb";
-        reviewBadge.style.borderColor = output.needs_review ? "#f2d4a2" : "#cfdeef";
-        reviewBadge.style.color = output.needs_review ? "#9b6500" : "#35506a";
-
-        const conf = Math.round((output.confidence || 0) * 100);
-        confidenceBar.style.width = conf + "%";
-        confidenceText.textContent = `Confidence: ${conf}%`;
-
-        loading.classList.remove("show");
-        results.classList.add("show");
-        results.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 950);
-    });
-
-    // initial view
-    (() => {
-      const initial = buildOutput(requestBox.value);
-      jsonOutput.textContent = JSON.stringify({
-        category: initial.category,
-        priority: initial.priority,
-        confidence: initial.confidence,
-        entities: initial.entities,
-        actions_taken: initial.actions_taken,
-        draft_reply: initial.draft_reply,
-        sources: initial.sources,
-        needs_review: initial.needs_review,
-        review_reason: initial.review_reason
-      }, null, 2);
-      draftOutput.textContent = initial.draft_reply;
-      setBadge(catBadge, "Category", initial.category);
-      setBadge(priBadge, "Priority", initial.priority);
-      confidenceBar.style.width = Math.round(initial.confidence * 100) + "%";
-      confidenceText.textContent = `Confidence: ${Math.round(initial.confidence * 100)}%`;
-      results.classList.add("show");
-    })();
-  </script>
+const $=id=>document.getElementById(id);
+const requestBox=$("request"),results=$("results"),btn=$("analyzeBtn"),loading=$("loading");
+const rules=[["security",/اختراق|حاول يدخل|إيميلاتنا|ايميلاتنا|تسرب|تسرّب|أمن|امن|security|breach|hack|phishing|unauthorized/i],["meetings",/موعد|اجتماع|meeting|schedule|appointment/i],["proposals",/عرض|سعر|تكلف|proposal|budget|quote|pricing/i],["automation",/أتمتة|اتمتة|automation|workflow|project status/i],["cloud",/سحاب|استضاف|سيرفر|server|cloud|backup|migration/i]];
+const names={security:"Cybersecurity",meetings:"Meetings",proposals:"Proposals",automation:"Automation",cloud:"Cloud services",out_of_scope:"Out of scope"};
+const plan={security:["Notify security team if critical","Create incident ticket","Search approved knowledge","Update CRM"],meetings:["Check engineer availability","Propose a slot if available","Update CRM"],proposals:["Retrieve proposal","Create sales follow-up ticket","Update CRM"],automation:["Check project status","Update CRM"],cloud:["Retrieve relevant guidance","Create cloud support ticket","Update CRM"],out_of_scope:[]};
+function analyze(t){
+ let masked=t.replace(/\bSA\d{2}(?:[ ]?[A-Z0-9]){20}\b/gi,"[IBAN]").replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi,"[EMAIL]").replace(/(?:\+966|00966|0)[\s-]?5(?:[\s-]?\d){8}\b/g,"[PHONE]").replace(/\b[12]\d{9}\b/g,"[NATIONAL_ID]");
+ let hits=rules.filter(x=>x[1].test(masked)),category=hits[0]?.[0]||"out_of_scope",critical=/اختراق|حاول يدخل|تسرّب|تسرب|breach|hack|unauthorized|طاح بالكامل|server is down|outage/i.test(masked),priority=category==="out_of_scope"?"low":critical?"critical":"normal",ar=/[\u0600-\u06ff]/.test(masked);
+ const dictionaries={PER:["سلطان","أحمد","محمد","خالد","Sultan","Ahmed","Khalid"],ORG:["DanaShift","دانا شيفت"],LOC:["الرياض","جدة","Riyadh","Jeddah"],DATE:["بكرة","غدًا","اليوم","أمس","tomorrow","today","next week"]};
+ let entities=Object.fromEntries(Object.entries(dictionaries).map(([k,v])=>[k,v.filter(x=>masked.toLowerCase().includes(x.toLowerCase()))]));
+ let replies={meetings:["شكرًا لتواصلك. يمكن لفريقنا مراجعة توفر المهندس واقتراح موعد مناسب بعد التحقق.","Thank you for reaching out. Our team can check the engineer’s availability and propose a suitable meeting time."],security:["شكرًا لإبلاغنا. يحتاج طلبك إلى مراجعة فريق الأمن السيبراني لتحديد الخطوات المناسبة.","Thank you for reporting this. Our cybersecurity team should review the request and confirm appropriate next steps."],cloud:["شكرًا لتواصلك. يحتاج فريق الخدمات السحابية إلى مراجعة تفاصيل الطلب وتحديد الحل المناسب.","Thank you for contacting us. Our cloud team should review the details and confirm next steps."],automation:["شكرًا لتواصلك. يمكن للفريق مراجعة حالة مشروع الأتمتة وتزويدك بتحديث بعد التحقق.","Thank you for reaching out. The team can verify the automation project status and provide an update."],proposals:["شكرًا لتواصلك. يمكن لفريق المبيعات مراجعة تفاصيل العرض والرد بعد التحقق.","Thank you for reaching out. Our sales team can review the proposal details and respond after verification."],out_of_scope:["شكرًا لتواصلك. خدماتنا تركز على الاستشارات التقنية والسحابة والأمن السيبراني والأتمتة.","Thank you for reaching out. Our services focus on technical consulting, cloud, cybersecurity and automation."]};
+ return {category,priority,confidence:null,entities,masked_request:masked,actions_taken:[],planned_actions:hits.length===1?plan[category].filter(a=>critical||!a.includes("if critical")):[],draft_reply:replies[category][ar?0:1],sources:[],needs_review:true,review_reason:hits.length>1?"Multiple keyword categories matched. Human triage required.":"Rule-based preview; no trained model or connected tools.",language:ar?"Arabic":"English",matched_categories:hits.map(x=>x[0])};
+}
+const steps=[...document.querySelectorAll(".step")];
+let busy=false;
+$("sample").onchange=()=>{requestBox.value=$("sample").value;requestBox.dir="auto";};
+$("clearBtn").onclick=()=>{if(busy)return;requestBox.value="";results.hidden=true;results.classList.remove("show");steps.forEach(s=>s.classList.remove("active","done"));requestBox.focus();};
+$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText($("jsonOutput").textContent);$("copyBtn").textContent="Copied";}catch{$("copyBtn").textContent="Copy unavailable";}setTimeout(()=>$("copyBtn").textContent="Copy JSON",1500);};
+function show(o){
+ $("catBadge").textContent=names[o.category];$("catBadge").className="badge "+o.category;
+ $("priBadge").textContent="Priority: "+o.priority;$("priBadge").className="badge "+o.priority;
+ $("reviewBadge").textContent="Staff review required";
+ $("confidenceText").textContent="Not available — rule-based preview";$("confidenceBar").style.width="0";
+ $("draftOutput").textContent=o.draft_reply;$("draftOutput").dir="auto";$("jsonOutput").textContent=JSON.stringify(o,null,2);
+ $("maskedOutput").textContent=o.masked_request;$("maskedOutput").dir="auto";
+ $("entitiesOutput").replaceChildren();for(const [k,v] of Object.entries(o.entities)){let p=document.createElement("p");p.textContent=k+": "+(v.join(", ")||"None detected");$("entitiesOutput").append(p);}
+ $("actionsOutput").replaceChildren();for(const a of o.planned_actions){let li=document.createElement("li");li.textContent=a;$("actionsOutput").append(li);}if(!o.planned_actions.length){let li=document.createElement("li");li.textContent="No automated actions proposed";$("actionsOutput").append(li);}
+ $("reason").textContent=o.review_reason;
+ results.hidden=false;requestAnimationFrame(()=>{results.classList.add("show");results.scrollIntoView({behavior:"smooth",block:"start"});});
+}
+btn.onclick=async()=>{let t=requestBox.value.trim();if(!t){requestBox.focus();$("message").textContent="Enter a request to analyze.";return}busy=true;btn.disabled=true;$("clearBtn").disabled=true;btn.textContent="Analyzing…";$("message").textContent="";results.hidden=true;results.classList.remove("show");loading.classList.add("show");steps.forEach(s=>s.classList.remove("active","done"));for(let i=0;i<steps.length;i++){steps[i].classList.add("active");$("stageText").textContent=["Masking personal identifiers…","Matching service keywords…","Identifying example entities…","Preparing suggested actions and reply…"][i];await new Promise(r=>setTimeout(r,320));steps[i].classList.remove("active");steps[i].classList.add("done");}show(analyze(t));loading.classList.remove("show");btn.disabled=false;$("clearBtn").disabled=false;btn.textContent="Analyze request";busy=false;};
+results.hidden=true;requestBox.dir="auto";
+</script>
 </body>
 </html>
