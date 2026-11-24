@@ -8,6 +8,31 @@ Developed as part of the **Applied Natural Language Processing Program** offered
 ## Overview
 DanaShift combines privacy-aware text preprocessing, Arabic language modeling, intent classification, entity annotation, semantic retrieval and human-supervised customer support workflows.
 
+## Vision — From customer requests to problem resolution
+
+DanaShift is envisioned as an intelligent, multilingual support agent that goes beyond keyword matching and ticket routing. Its long-term goal is to understand customer problems in context, reason over relevant technical knowledge, identify possible causes, recommend practical solutions, and support resolution from the initial request through follow-up.
+
+### Future capabilities
+
+| Capability | Intended business value |
+|---|---|
+| Contextual understanding of Arabic dialects and English | Understand customer intent even when requests are ambiguous or informally expressed |
+| Intelligent diagnosis and troubleshooting | Identify likely causes, ask targeted follow-up questions, and recommend evidence-grounded solutions |
+| Retrieval-augmented generation (RAG) | Retrieve relevant documentation, previous cases and approved procedures to support accurate answers |
+| Tool-enabled problem resolution | Integrate authorized ticketing, CRM, scheduling and project systems to support appropriate actions |
+| Multi-turn assistance | Maintain relevant case context and guide customers through troubleshooting and follow-up |
+| Human oversight and safe escalation | Escalate critical, uncertain or sensitive cases; require approval for consequential actions |
+| Privacy-aware processing | Minimize exposure of personal information throughout the support workflow |
+
+### Development roadmap
+
+- **Current prototype:** NLP component experiments in the project notebook and a rule-based browser demonstration of the intended workflow.
+- **Next stage:** Integrate trained intent and entity models with semantic retrieval and a grounded reasoning layer; evaluate on larger multilingual datasets.
+- **Future product:** Build an agent capable of contextual troubleshooting, recommending and coordinating solutions through authorized tools, with human approval where appropriate.
+- **Impact validation:** Measure resolution quality, response time, routing accuracy and staff workload against a manual baseline.
+
+The rule-based demo is a lightweight illustration of the user experience, not the intended final architecture. The future capabilities and business benefits above are development objectives, not claims of currently deployed functionality or measured outcomes.
+
 ## Experimental methodology
 | Stage | Focus | Recorded result |
 |---|---|---|
@@ -40,7 +65,7 @@ flowchart TD
 
 ## Repository guide
 - [Experiment notes](docs/experiments.md)
-- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — browser-based simulated workflow, not live model inference.
+- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — current rule-based workflow preview; the long-term vision is a model-powered problem-resolution agent.
 
 ## Acknowledgments
 SDAIA Academy, Saudi Data and Artificial Intelligence Authority, for the Applied Natural Language Processing Program.
