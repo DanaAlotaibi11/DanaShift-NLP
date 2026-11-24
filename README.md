@@ -1,20 +1,28 @@
+<div align="center">
+
 # DanaShift
 
-### From customer messages to intelligent problem resolution.
+**Multilingual AI Support Agent**
 
-**Multilingual AI support agent for technical consulting**
+*From customer messages to intelligent problem resolution.*
 
-Developed as part of the **Applied Natural Language Processing Program** offered by **SDAIA Academy**, affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
+[Live Demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) &nbsp;·&nbsp; [Presentation](https://www.canva.com/d/aEq6WDan0hOMRJO) &nbsp;·&nbsp; [Notebook](DanaShift.ipynb) &nbsp;·&nbsp; [Architecture](docs/architecture.md)
 
-[**Explore the interactive demo**](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) · [Project notebook](DanaShift.ipynb) · [Product architecture](docs/architecture.md)
+`Arabic & English` &nbsp; `Applied NLP` &nbsp; `Human-in-the-loop`
 
-## The challenge
+Developed as part of the **Applied Natural Language Processing Program** at **SDAIA Academy**, affiliated with the Saudi Data and Artificial Intelligence Authority (SDAIA).
+
+</div>
+
+---
+
+## 01 / The challenge
 
 Technical support teams receive requests in different languages, dialects and levels of urgency. Manual triage consumes staff time, investigations may be repeated, and critical requests can get buried among routine messages.
 
 **Sorting a request is not the same as solving it.**
 
-## From inbox to resolution
+## 02 / From inbox to resolution
 
 DanaShift is envisioned as an AI-powered support agent that understands customer problems in context, retrieves relevant technical knowledge, identifies potential causes and recommends practical solutions. Its purpose is to help staff and customers move from the initial message toward resolution, not simply forward tickets.
 
@@ -31,7 +39,7 @@ The target scope includes cybersecurity, cloud and infrastructure support, autom
 
 These are development goals; business impact has not yet been measured.
 
-## AI resolution pipeline — target architecture
+## 03 / AI resolution pipeline
 
 ```mermaid
 flowchart TD
@@ -64,13 +72,13 @@ flowchart TD
 
 This is the proposed future workflow, not a claim of an integrated production system. The current browser prototype demonstrates initial triage and suggested actions using rules; it does not run trained models, perform live diagnosis, execute tools or send messages.
 
-## Example: a customer reports a technical issue
+## 04 / A customer story
 
 > Our system keeps crashing after the latest update. Can you help identify the cause and restore service?
 
 The envisioned agent would clarify symptoms, retrieve relevant documentation, reason about potential causes, propose troubleshooting steps, request approval for consequential actions and follow up to verify the outcome. If evidence is insufficient or specialist input is needed, the case is escalated rather than presenting a speculative diagnosis as fact.
 
-## Experimental foundations
+## 05 / Experimental foundations
 
 | Component | Recorded observation |
 |---|---|
@@ -83,7 +91,7 @@ The envisioned agent would clarify symptoms, retrieve relevant documentation, re
 
 These observations come from saved notebook experiments and small illustrative samples, not production performance benchmarks. The separate FAISS example already retrieved the relevant incident first; the reranking comparison uses a separately supplied candidate order.
 
-## Development roadmap
+## 06 / Development roadmap
 
 | Stage | Focus |
 |---|---|
@@ -92,8 +100,9 @@ These observations come from saved notebook experiments and small illustrative s
 | Future | Contextual reasoning, multi-turn troubleshooting, grounded recommendations and authorized tool execution |
 | Validation | Measure resolution quality, response time, routing accuracy and staff workload against a manual baseline |
 
-## Explore the project
+## 07 / Explore the project
 
+- [Project presentation — illustrated case study](https://www.canva.com/d/aEq6WDan0hOMRJO) — challenge, vision, workflow and experimental foundations.
 - [DanaShift.ipynb](DanaShift.ipynb) — methodology, code, charts and experimental results.
 - [Architecture and workflow](docs/architecture.md) — target design and operational safeguards.
 - [Experiment notes](docs/experiments.md) — supporting technical observations.
