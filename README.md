@@ -42,32 +42,34 @@ These are development goals; business impact has not yet been measured.
 ## 03 / AI resolution pipeline
 
 ```mermaid
+%%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 35, "rankSpacing": 45}, "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "14px"}}}%%
 flowchart TD
-    A["Customer message · Arabic / English"] --> B["Privacy masking"]
-    B --> C["Contextual understanding · intent & urgency"]
-    C --> D["Entity extraction & case context"]
-    D --> E{"Within service scope?"}
-    E -->|No| F["Explain scope · offer human assistance"]
-    E -->|Yes| G{"Critical or sensitive?"}
-    G -->|Yes| H["Recommend immediate specialist escalation"]
-    G -->|No| I["Retrieve approved knowledge & previous cases"]
-    H --> I
-    I --> J["Reason over evidence · identify likely causes"]
-    J --> K{"Enough context and evidence?"}
-    K -->|No| L["Ask targeted follow-up questions"]
-    L --> B
-    K -->|Yes| M["Recommend a resolution plan"]
-    M --> N["Human review & authorization"]
-    N -->|Approved| O["Authorized tools · ticket / CRM / scheduling"]
-    N -->|Revise| J
-    O --> P["Verify outcome & follow up"]
-    P --> Q{"Issue resolved?"}
-    Q -->|Yes| R["Close case · record outcome"]
-    Q -->|No| I
+    A["Customer request"] --> B["Protect personal data"]
+    B --> C["Understand intent"]
+    C --> D["Assess urgency"]
+    D --> E["Extract context"]
+    E --> F{"In scope?"}
+    F -->|No| G["Offer assistance"]
+    F -->|Yes| H{"Critical case?"}
+    H -->|Yes| I["Escalate to specialist"]
+    H -->|No| J["Retrieve knowledge"]
+    I --> J
+    J --> K["Diagnose issue"]
+    K --> L{"Enough evidence?"}
+    L -->|No| M["Clarify symptoms"]
+    M --> B
+    L -->|Yes| N["Propose solution"]
+    N --> O{"Staff approval?"}
+    O -->|Revise| K
+    O -->|Approved| P["Authorized actions"]
+    P --> Q["Verify outcome"]
+    Q --> R{"Resolved?"}
+    R -->|No| J
+    R -->|Yes| S["Close case"]
     classDef core fill:#e4ecd9,stroke:#49644d,color:#182b22
     classDef review fill:#ffe7ce,stroke:#d67a36,color:#55331e
-    class B,C,D,I,J,M core
-    class H,N,P review
+    class B,C,D,E,J,K,N core
+    class I,O,Q review
 ```
 
 This is the proposed future workflow, not a claim of an integrated production system. The current browser prototype demonstrates initial triage and suggested actions using rules; it does not run trained models, perform live diagnosis, execute tools or send messages.
