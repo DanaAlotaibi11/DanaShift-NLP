@@ -114,4 +114,4 @@ These observations come from saved notebook experiments and small illustrative s
 
 SDAIA Academy — Applied Natural Language Processing Program, Saudi Data and Artificial Intelligence Authority (SDAIA).
 
-DanaShift is an educational project, not an official SDAIA product.
+
