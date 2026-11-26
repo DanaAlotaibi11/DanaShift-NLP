@@ -6,7 +6,7 @@
 
 *From customer messages to intelligent problem resolution.*
 
-[Live Demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) &nbsp;·&nbsp; [Presentation](https://www.canva.com/d/aEq6WDan0hOMRJO) &nbsp;·&nbsp; [Notebook](DanaShift.ipynb) &nbsp;·&nbsp; [Architecture](docs/architecture.md)
+[Presentation](https://www.canva.com/d/aEq6WDan0hOMRJO) &nbsp;·&nbsp; [Notebook](DanaShift.ipynb) &nbsp;·&nbsp; [Architecture](docs/architecture.md)
 
 `Arabic & English` &nbsp; `Applied NLP` &nbsp; `Human-in-the-loop`
 
@@ -72,7 +72,7 @@ flowchart TD
     class I,O,Q review
 ```
 
-This is the proposed future workflow, not a claim of an integrated production system. The current browser prototype demonstrates initial triage and suggested actions using rules; it does not run trained models, perform live diagnosis, execute tools or send messages.
+This is the proposed future workflow, not a claim of an integrated production system. The current implementation consists of experimental NLP components; integrated diagnosis, tool execution and end-to-end resolution remain future development goals.
 
 ## 04 / A customer story
 
@@ -108,7 +108,6 @@ These observations come from saved notebook experiments and small illustrative s
 - [DanaShift.ipynb](DanaShift.ipynb) — methodology, code, charts and experimental results.
 - [Architecture and workflow](docs/architecture.md) — target design and operational safeguards.
 - [Experiment notes](docs/experiments.md) — supporting technical observations.
-- [Interactive live demo](https://danaalotaibi11.github.io/DanaShift-NLP/demo/workspace.html) — initial workflow preview.
 
 ## Acknowledgments
 
